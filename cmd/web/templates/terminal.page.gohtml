@@ -61,6 +61,12 @@
         const processing = document.getElementById("processing_payment")
 
         stripe = Stripe('')
+
+        function hidePayButton() {
+            payButton.classList.add("d-none")
+            processing.classList.remove("d-none")
+        }
+
         function val() {
             let form = document.getElementById("charge_form")
             // use standard Bootstrap validation
@@ -71,6 +77,7 @@
                 return;
             }
             form.classList.add("was-validated");
+            hidePayButton()
         }
 
         (function() {
