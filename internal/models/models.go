@@ -27,12 +27,12 @@ func NewModels(db *sql.DB) Models {
 
 // Widget is the type for widgets
 type Widget struct {
-	ID             int       `json:"id"`
-	Name           string    `json:"name"`
-	Description    string    `json:"description"`
-	InventoryLevel int       `json:"inventory_level"`
-	Price          int       `json:"price"`
-	Image          string    `json:"image"`
+	ID             int       `json:"ID"`
+	Name           string    `json:"Name"`
+	Description    string    `json:"Description"`
+	InventoryLevel int       `json:"InventoryLevel"`
+	Price          int       `json:"Price"`
+	Image          string    `json:"Image"`
 	CreatedAt      time.Time `json:"-"`
 	UpdatedAt      time.Time `json:"-"`
 }
@@ -94,8 +94,23 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 
 	var widget Widget
 
-	row := m.DB.QueryRowContext(ctx, "select id, name from widgets where id = ?", id)
-	err := row.Scan(&widget.ID, &widget.Name)
+	row := m.DB.QueryRowContext(ctx, `
+			select 
+				id, name, description, inventory_level, price, image, 
+				created_at, updated_at 
+			from 
+				widgets 
+			where id = ?`, id)
+	err := row.Scan(
+		&widget.ID,
+		&widget.Name,
+		&widget.Description,
+		&widget.InventoryLevel,
+		&widget.Price,
+		&widget.Image,
+		&widget.CreatedAt,
+		&widget.UpdatedAt,
+	)
 	if err != nil {
 		return widget, err
 	}
