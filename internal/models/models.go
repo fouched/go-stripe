@@ -42,6 +42,7 @@ type Order struct {
 	ID            int       `json:"ID"`
 	WidgetID      int       `json:"WidgetID"`
 	TransactionID int       `json:"TransactionID"`
+	CustomerID    int       `json:"CustomerID"`
 	StatusID      int       `json:"StatusID"`
 	Quantity      int       `json:"Quantity"`
 	Amount        int       `json:"Amount"`
@@ -84,6 +85,16 @@ type User struct {
 	LastName  string    `json:"LastName"`
 	Email     string    `json:"Email"`
 	Password  string    `json:"Password"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// Customer is the type for users
+type Customer struct {
+	ID        int       `json:"ID"`
+	FirstName string    `json:"FirstName"`
+	LastName  string    `json:"LastName"`
+	Email     string    `json:"Email"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
