@@ -7,6 +7,7 @@
 {{define "content"}}
     <h2 class="mt-5">Payment Succeeded</h2>
     <hr>
+    <p>Customer Name: {{index .Data "firstName"}} {{index .Data "lastName"}}</p>
     <p>Card Holder: {{index .Data "cardHolder"}}</p>
     <p>Email: {{index .Data "email"}}</p>
     <p>Payment Intent: {{index .Data "paymentIntent"}}</p>
