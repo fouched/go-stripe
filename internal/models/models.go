@@ -27,78 +27,80 @@ func NewModels(db *sql.DB) Models {
 
 // Widget is the type for widgets
 type Widget struct {
-	ID             int       `json:"ID"`
-	Name           string    `json:"Name"`
-	Description    string    `json:"Description"`
-	InventoryLevel int       `json:"InventoryLevel"`
-	Price          int       `json:"Price"`
-	Image          string    `json:"Image"`
+	ID             int       `json:"id"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
+	InventoryLevel int       `json:"inventory_level"`
+	Price          int       `json:"price"`
+	Image          string    `json:"image"`
+	IsRecurring    bool      `json:"is_recurring"`
+	PlanID         string    `json:"plan_id"`
 	CreatedAt      time.Time `json:"-"`
 	UpdatedAt      time.Time `json:"-"`
 }
 
 // Order is the type for orders
 type Order struct {
-	ID            int       `json:"ID"`
-	WidgetID      int       `json:"WidgetID"`
-	TransactionID int       `json:"TransactionID"`
-	CustomerID    int       `json:"CustomerID"`
-	StatusID      int       `json:"StatusID"`
-	Quantity      int       `json:"Quantity"`
-	Amount        int       `json:"Amount"`
+	ID            int       `json:"id"`
+	WidgetID      int       `json:"widget_id"`
+	TransactionID int       `json:"transaction_id"`
+	CustomerID    int       `json:"customer_id"`
+	StatusID      int       `json:"status_id"`
+	Quantity      int       `json:"quantity"`
+	Amount        int       `json:"amount"`
 	CreatedAt     time.Time `json:"-"`
 	UpdatedAt     time.Time `json:"-"`
 }
 
 // Status is the type for order statuses
 type Status struct {
-	ID        int       `json:"ID"`
-	Name      string    `json:"Name"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
 
 // TransactionStatus is the type for transaction statuses
 type TransactionStatus struct {
-	ID        int       `json:"ID"`
-	Name      string    `json:"Name"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
 
 // Transaction is the type for transactions
 type Transaction struct {
-	ID                  int       `json:"ID"`
-	Amount              int       `json:"Amount"`
-	Currency            string    `json:"Currency"`
-	LastFour            string    `json:"LastFour"`
-	PaymentMethod       string    `json:"PaymentMethod"`
-	PaymentIntent       string    `json:"PaymentIntent"`
-	ExpiryMonth         int       `json:"ExpiryMonth"`
-	ExpiryYear          int       `json:"ExpiryYear"`
-	BankReturnCode      string    `json:"BankReturnCode"`
-	TransactionStatusID int       `json:"TransactionStatusID"`
+	ID                  int       `json:"id"`
+	Amount              int       `json:"amount"`
+	Currency            string    `json:"currency"`
+	LastFour            string    `json:"last_four"`
+	PaymentMethod       string    `json:"payment_method"`
+	PaymentIntent       string    `json:"payment_intent"`
+	ExpiryMonth         int       `json:"expiry_month"`
+	ExpiryYear          int       `json:"expiry_year"`
+	BankReturnCode      string    `json:"bank_return_code"`
+	TransactionStatusID int       `json:"transaction_status_id"`
 	CreatedAt           time.Time `json:"-"`
 	UpdatedAt           time.Time `json:"-"`
 }
 
 // User is the type for users
 type User struct {
-	ID        int       `json:"ID"`
-	FirstName string    `json:"FirstName"`
-	LastName  string    `json:"LastName"`
-	Email     string    `json:"Email"`
-	Password  string    `json:"Password"`
+	ID        int       `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
 
 // Customer is the type for users
 type Customer struct {
-	ID        int       `json:"ID"`
-	FirstName string    `json:"FirstName"`
-	LastName  string    `json:"LastName"`
-	Email     string    `json:"Email"`
+	ID        int       `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
@@ -112,7 +114,7 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 	row := m.DB.QueryRowContext(ctx, `
 			select 
 				id, name, description, inventory_level, price, image, 
-				created_at, updated_at 
+				is_recurring, plan_id, created_at, updated_at 
 			from 
 				widgets 
 			where id = ?`, id)
@@ -123,6 +125,8 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 		&widget.InventoryLevel,
 		&widget.Price,
 		&widget.Image,
+		&widget.IsRecurring,
+		&widget.PlanID,
 		&widget.CreatedAt,
 		&widget.UpdatedAt,
 	)
