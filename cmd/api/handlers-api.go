@@ -244,3 +244,28 @@ func (app *application) SaveCustomer(firstName, lastName, email string) (int, er
 
 	return id, nil
 }
+
+func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) {
+	var userInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJSON(w, r, &userInput)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	var payLoad struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	payLoad.Error = false
+	payLoad.Message = "Success!"
+
+	out, _ := json.MarshalIndent(payLoad, "", "\t")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
