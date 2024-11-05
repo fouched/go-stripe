@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/fouched/go-stripe/internal/cards"
 	"github.com/fouched/go-stripe/internal/models"
 	"github.com/go-chi/chi/v5"
@@ -277,16 +278,22 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// generate token
+	token, err := models.GenerateToken(user.ID, 24*time.Hour, models.ScopeAuthentication)
+	if err != nil {
+		app.badRequest(w, r, err)
+	}
 
 	// send response
 
 	var payLoad struct {
-		Error   bool   `json:"error"`
-		Message string `json:"message"`
+		Error   bool          `json:"error"`
+		Message string        `json:"message"`
+		Token   *models.Token `json:"authentication_token"`
 	}
 
 	payLoad.Error = false
-	payLoad.Message = "Success!"
+	payLoad.Message = fmt.Sprintf("token for %s created", userInput.Email)
+	payLoad.Token = token
 
 	_ = app.writeJSON(w, http.StatusOK, payLoad)
 }
