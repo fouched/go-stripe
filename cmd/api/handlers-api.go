@@ -283,6 +283,12 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 		app.badRequest(w, r, err)
 	}
 
+	// save to database
+	err = app.DB.InsertToken(token, user)
+	if err != nil {
+		app.badRequest(w, r, err)
+	}
+
 	// send response
 
 	var payLoad struct {
@@ -296,4 +302,8 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	payLoad.Token = token
 
 	_ = app.writeJSON(w, http.StatusOK, payLoad)
+}
+
+func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Request) {
+	app.invalidCredentials(w)
 }

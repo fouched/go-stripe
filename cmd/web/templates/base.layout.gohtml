@@ -13,7 +13,7 @@
     <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Brand</a>
+            <a class="navbar-brand" href="#">WidgetEmp</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -21,9 +21,6 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/virtual-terminal">Virtual Terminal</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -34,9 +31,12 @@
                             <li><a class="dropdown-item" href="/plans/bronze">Subscription</a></li>
                         </ul>
                     </li>
+                    <li id="vt_link" class="nav-item d-none">
+                        <a class="nav-link" href="/virtual-terminal">Virtual Terminal</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
+                    <li id="login_link" class="nav-item d-none">
                         <a href="/login" class="nav-link">Login</a>
                     </li>
                 </ul>
@@ -51,6 +51,53 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        let loginLink = document.getElementById("login_link");
+        let vtLink = document.getElementById("vt_link");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem("token") !== null) {
+                loginLink.innerHTML = ' <a href="#" onclick="logout()" class="nav-link">Logout</a>';
+                vtLink.classList.remove("d-none");
+            } else {
+                loginLink.innerHTML = ' <a href="/login" class="nav-link">Login</a>';
+            }
+            loginLink.classList.remove("d-none");
+        })
+
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("token_expiry");
+            location.href = "/login"
+        }
+
+        function checkAuth() {
+            if (localStorage.getItem("token") === null) {
+                location.href = "/login";
+            } else {
+                let token = localStorage.getItem("token");
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Authorization", "Bearer " + token);
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: myHeaders,
+                }
+
+                fetch("{{.API}}/api/is-authenticated", requestOptions)
+                    .then(response => response.json())
+                    .then(function(data) {
+                        if (data.error === true) {
+                            console.log("not logged in");
+                            location.href = "/login";
+                        } else{
+                            console.log("logged in");
+                        }
+                    })
+            }
+        }
+    </script>
     {{block "js" .}}
     {{end}}
     </body>
