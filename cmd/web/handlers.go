@@ -17,7 +17,7 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// VirtualTerminal displayes the virtual terminal page
+// VirtualTerminal displays the virtual terminal page
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.renderTemplate(w, r, "terminal", &templateData{}); err != nil {
