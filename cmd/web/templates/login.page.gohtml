@@ -10,7 +10,7 @@
 
         <div class="alert alert-danger text-center d-none mt-3" id="login_messages"></div>
 
-        <form action="" method="POST"
+        <form action="/login" method="POST"
               name="login_form" id="login_form"
               class="d-block needs-validation login_form"
               autocomplete="off" novalidate>
@@ -33,6 +33,9 @@
             <hr>
 
             <a href="javascript:void(0)" class="btn btn-primary" onclick="val()">Login</a>
+            <p class="mt-2">
+                <small><a href="/forgot-password">Forgot password?</a></small>
+            </p>
         </form>
     </div>
 </div>
@@ -90,7 +93,7 @@
                     localStorage.setItem('token', data.authentication_token.token);
                     localStorage.setItem('token_expiry', data.authentication_token.expiry);
                     showSuccess();
-                    location.href = "/";
+                    document.getElementById("login_form").submit();
                 } else {
                     showError(data.message)
                 }

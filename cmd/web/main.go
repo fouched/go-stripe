@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/fouched/go-stripe/internal/driver"
 	"github.com/fouched/go-stripe/internal/models"
@@ -84,6 +85,10 @@ func main() {
 	// set up session
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
+	// we use persistent storage iso cookies for session data, this allows us to
+	// restart the server without users losing the login / session information
+	// https://github.com/alexedwards/scs has various options available
+	session.Store = mysqlstore.New(conn)
 
 	tc := make(map[string]*template.Template)
 

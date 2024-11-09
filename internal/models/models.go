@@ -3,11 +3,13 @@ package models
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
 )
 
-const dbTimeout = 3 * time.Second
+const dbTimeout = 300 * time.Second
 
 // DBModel is the type for database connection values
 type DBModel struct {
@@ -263,4 +265,27 @@ func (m *DBModel) GetUserByEmail(email string) (User, error) {
 	}
 
 	return u, nil
+}
+
+func (m *DBModel) Authenticate(email, password string) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	var id int
+	var hashedPassword string
+
+	row := m.DB.QueryRowContext(ctx, "select id, password from users where email = ?", email)
+	err := row.Scan(&id, &hashedPassword)
+	if err != nil {
+		return id, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, errors.New("incorrect credentials")
+	} else if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

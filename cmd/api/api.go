@@ -23,6 +23,13 @@ type config struct {
 		secret string
 		key    string
 	}
+	smtp struct {
+		host       string
+		port       int
+		username   string
+		password   string
+		encryption string
+	}
 }
 
 type application struct {
@@ -54,6 +61,11 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4001, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production|maintenance}")
 	flag.StringVar(&cfg.db.dsn, "dsn", "fouche:secret@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "DSN")
+	flag.StringVar(&cfg.smtp.host, "smtphost", "localhost", "smtp host")
+	flag.IntVar(&cfg.smtp.port, "smtpport", 1025, "smtp port")
+	flag.StringVar(&cfg.smtp.username, "smtpuser", "", "smtp user")
+	flag.StringVar(&cfg.smtp.password, "smtppass", "", "smtp password")
+	flag.StringVar(&cfg.smtp.encryption, "smtpencryption", "none", "smtp encryption")
 
 	flag.Parse()
 
