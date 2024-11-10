@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/fouched/go-stripe/internal/cards"
+	"github.com/fouched/go-stripe/internal/encryption"
 	"github.com/fouched/go-stripe/internal/models"
+	"github.com/fouched/go-stripe/internal/urlsigner"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -355,6 +358,48 @@ func (app *application) Logout(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "forgot-password", &templateData{}); err != nil {
+		app.errorLog.Print(err)
+	}
+}
+
+func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
+	email := r.URL.Query().Get("email")
+	theURL := r.RequestURI
+	testURL := fmt.Sprintf("%s%s", app.config.frontend, theURL)
+
+	signer := urlsigner.Signer{
+		Secret: []byte(app.config.secretkey),
+	}
+
+	valid := signer.VerifyToken(testURL)
+	if !valid {
+		app.errorLog.Println("Invalid url - tampering detected")
+		return
+	}
+
+	// check expiry
+	expired := signer.Expired(testURL, 60)
+	if expired {
+		app.errorLog.Println("Link expired")
+		return
+	}
+
+	encryptor := encryption.Encryption{
+		Key: []byte(app.config.secretkey),
+	}
+
+	encryptedEmail, err := encryptor.Encrypt(email)
+	if err != nil {
+		app.errorLog.Println("Encryption failed")
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["email"] = encryptedEmail
+
+	if err := app.renderTemplate(w, r, "reset-password", &templateData{
+		Data: data,
+	}); err != nil {
 		app.errorLog.Print(err)
 	}
 }
