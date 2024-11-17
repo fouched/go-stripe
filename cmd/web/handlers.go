@@ -410,6 +410,7 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AllSubscriptions shows all subscriptions page
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "all-subscriptions", &templateData{}); err != nil {
 		app.errorLog.Print(err)
@@ -444,6 +445,20 @@ func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request)
 	if err := app.renderTemplate(w, r, "show-sale", &templateData{
 		StringMap: stringMap,
 	}); err != nil {
+		app.errorLog.Print(err)
+	}
+}
+
+// AllUsers show all users page
+func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "all-users", &templateData{}); err != nil {
+		app.errorLog.Print(err)
+	}
+}
+
+// OneUser shows one user for CRUD
+func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "one-user", &templateData{}); err != nil {
 		app.errorLog.Print(err)
 	}
 }
