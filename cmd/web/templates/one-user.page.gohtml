@@ -7,9 +7,74 @@
 {{define "content"}}
     <h2 class="mt-5">Admin User</h2>
     <hr>
+    <form class="needs-validation" method="post" action=""
+          name="user-form" id="user-form" autocomplete="off" novalidate="">
+
+        <div class="mb-3">
+            <label for="first-name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="first-name" name="first-name"
+                autocomplete="first-name-new" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="last-name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="last-name" name="last-name"
+                   autocomplete="last-name-new" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   autocomplete="email-new" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password"
+                   autocomplete="password-new">
+        </div>
+
+        <div class="mb-3">
+            <label for="verify-password" class="form-label">Verify Password</label>
+            <input type="password" class="form-control" id="verify-password" name="verify-password"
+                   autocomplete="verify-password-new">
+        </div>
+
+        <hr>
+
+        <div class="float-start">
+            <a href="javascript:void(0)" class="btn btn-primary" id="save-btn">Save Changes</a>
+            <a href="javascript:void(0)" class="btn btn-warning" id="cancel-btn">Cancel</a>
+        </div>
+        <div class="float-end">
+            <a href="javascript:void(0)" class="btn btn-danger" id="delete-btn">Delete</a>
+        </div>
+
+    </form>
 
 {{end}}
 
 {{define "js"}}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let token = localStorage.getItem("token");
+    let id = window.location.pathname.split("/").pop();
 
+    const requestOptions = {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+        }
+    }
+
+    fetch('{{.API}}/api/admin/all-users/' + id, requestOptions)
+        .then(response => response.json())
+        .then(function (data) {
+            console.log(data);
+        });
+
+})
+</script>
 {{end}}
