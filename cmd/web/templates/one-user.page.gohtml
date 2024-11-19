@@ -28,6 +28,11 @@
                    autocomplete="email-new" required>
         </div>
 
+        <div class="d-none" id="edit-pwd">
+            <div class="mt-5">Change the password if required</div>
+            <hr class="mb-3">
+        </div>
+
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password"
@@ -47,7 +52,7 @@
             <a href="javascript:void(0)" class="btn btn-warning" id="cancel-btn">Cancel</a>
         </div>
         <div class="float-end">
-            <a href="javascript:void(0)" class="btn btn-danger" id="delete-btn">Delete</a>
+            <a href="javascript:void(0)" class="btn btn-danger d-none" id="delete-btn">Delete</a>
         </div>
 
     </form>
@@ -55,26 +60,60 @@
 {{end}}
 
 {{define "js"}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    let token = localStorage.getItem("token");
-    let id = window.location.pathname.split("/").pop();
+let token = localStorage.getItem("token");
+let id = window.location.pathname.split("/").pop();
+let delBtn = document.getElementById("delete-btn");
+let editLbl = document.getElementById("edit-pwd")
 
-    const requestOptions = {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token,
+document.addEventListener("DOMContentLoaded", function() {
+
+    if (id !== "0") {
+
+        editLbl.classList.remove("d-none")
+
+        // do not allow a user to delete themselves
+        if (id !== "{{.UserID}}") {
+            delBtn.classList.remove("d-none");
         }
+
+        const requestOptions = {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            }
+        }
+
+        fetch('{{.API}}/api/admin/all-users/' + id, requestOptions)
+            .then(response => response.json())
+            .then(function (data) {
+                console.log(data);
+                if (data) {
+                    document.getElementById("first-name").value = data.first_name;
+                    document.getElementById("last-name").value = data.last_name;
+                    document.getElementById("email").value = data.email;
+                }
+            });
     }
 
-    fetch('{{.API}}/api/admin/all-users/' + id, requestOptions)
-        .then(response => response.json())
-        .then(function (data) {
-            console.log(data);
-        });
-
 })
+
+delBtn.addEventListener("click", function () {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to undo this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Delete User"
+    }).then((result) => {
+        console.log("would delete user id", id);
+    });
+})
+
 </script>
 {{end}}
