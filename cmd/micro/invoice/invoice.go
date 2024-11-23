@@ -32,6 +32,10 @@ type application struct {
 }
 
 func (app *application) serve() error {
+
+	//TODO in prod we would probably this microservice would have its own database
+	// it would also have additional functionality such as invoice retrieval
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", app.config.port),
 		Handler:           app.routes(),
