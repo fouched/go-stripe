@@ -27,12 +27,18 @@
             <label for="first_name" class="form-label">First Name</label>
             <input type="text" class="form-control" id="first_name" name="first_name"
                    required="" autocomplete="first_name_new">
+            <div id="first_name_help" class="valid-feedback">
+                Looks good!
+            </div>
         </div>
 
         <div class="mb-3">
             <label for="last_name" class="form-label">Last Name</label>
             <input type="text" class="form-control" id="last_name" name="last_name"
                    required="" autocomplete="last_name_new">
+            <div id="last_name_help" class="valid-feedback">
+                Looks good!
+            </div>
         </div>
 
         <div class="mb-3">
@@ -163,20 +169,34 @@
             fetch("{{.API}}/api/create-customer-and-subscribe-to-plan", requestOptions)
                 .then(response => response.json())
                 .then(function(data) {
-                    console.log(data)
-                    processing.classList.add("d-none")
-                    showCardSuccess()
-                    // sessionStorage a available by default in JS
-                    // The read-only sessionStorage property accesses a session Storage
-                    // object for the current origin. sessionStorage is similar to localStorage;
-                    // the difference is that while data in localStorage doesn't expire,
-                    // data in sessionStorage is cleared when the page session ends.
-                    sessionStorage.first_name = document.getElementById("first_name").value;
-                    sessionStorage.last_name = document.getElementById("last_name").value;
-                    sessionStorage.amount = "{{formatCurrency $widget.Price}}";
-                    sessionStorage.last_four = result.paymentMethod.card.last4;
+                    if (data.error === false) {
+                        console.log(data)
+                        processing.classList.add("d-none")
+                        showCardSuccess()
+                        // sessionStorage a available by default in JS
+                        // The read-only sessionStorage property accesses a session Storage
+                        // object for the current origin. sessionStorage is similar to localStorage;
+                        // the difference is that while data in localStorage doesn't expire,
+                        // data in sessionStorage is cleared when the page session ends.
+                        sessionStorage.first_name = document.getElementById("first_name").value;
+                        sessionStorage.last_name = document.getElementById("last_name").value;
+                        sessionStorage.amount = "{{formatCurrency $widget.Price}}";
+                        sessionStorage.last_four = result.paymentMethod.card.last4;
 
-                    location.href = "/receipt/bronze";
+                        location.href = "/receipt/bronze";
+                    } else {
+                        document.getElementById("charge_form").classList.remove("was-validated");
+
+                        Object.entries(data.errors).forEach((i) => {
+                            const [key, value] = i;
+                            console.log(`${key}:${value}`);
+                            document.getElementById(key).classList.add("is-invalid");
+                            document.getElementById(key + "_help").classList.remove("valid-feedback");
+                            document.getElementById(key + "_help").classList.add("invalid-feedback");
+                            document.getElementById(key + "_help").innerText = value;
+                        })
+                        showPayButton();
+                    }
                 })
         }
     }

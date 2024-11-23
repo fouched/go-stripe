@@ -9,6 +9,7 @@ import (
 	"github.com/fouched/go-stripe/internal/encryption"
 	"github.com/fouched/go-stripe/internal/models"
 	"github.com/fouched/go-stripe/internal/urlsigner"
+	"github.com/fouched/go-stripe/internal/validator"
 	"github.com/go-chi/chi/v5"
 	"github.com/stripe/stripe-go/v72"
 	"golang.org/x/crypto/bcrypt"
@@ -134,6 +135,15 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	app.infoLog.Println(data.Email, data.LastFour, data.PaymentMethod, data.Plan)
 
+	// validate data
+	v := validator.New()
+	v.Check(len(data.FirstName) > 1, "first_name", "must be at least 2 characters")
+	v.Check(data.LastName != "", "last_name", "cannot be empty")
+	if !v.Valid() {
+		app.failedValidation(w, r, v.Errors)
+		return
+	}
+
 	card := cards.Card{
 		Secret:   app.config.stripe.secret,
 		Key:      app.config.stripe.key,
@@ -156,7 +166,7 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		if err != nil {
 			app.errorLog.Println(err)
 			okay = false
-			txnMsg = "Error subscribing customer"
+			txnMsg = "Errors subscribing customer"
 		}
 		app.infoLog.Println("subscription id is", subscription.ID)
 	}
