@@ -40,6 +40,8 @@ func (app *application) serve() error {
 	//TODO in prod we would probably this microservice would have its own database
 	// it would also have additional functionality such as invoice retrieval
 
+	//TODO also see: https://callistaenterprise.se/blogg/teknik/2019/10/05/go-worker-cancellation/
+
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", app.config.port),
 		Handler:           app.routes(),
