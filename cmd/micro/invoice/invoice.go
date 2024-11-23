@@ -33,6 +33,8 @@ type application struct {
 
 func (app *application) serve() error {
 
+	//TODO if we are in a Go stack this microservice should really use gRPC
+
 	//TODO in prod we would probably this microservice would have its own database
 	// it would also have additional functionality such as invoice retrieval
 
